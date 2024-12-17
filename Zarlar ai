@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI News Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #007BFF;
+        }
+
+        input {
+            padding: 10px;
+            width: 70%;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #results {
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: left;
+        }
+
+        .article {
+            background: #fff;
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .article h3 {
+            margin: 0 0 10px;
+        }
+
+        .article a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI News Assistant</h1>
+    <p>Ask me about any topic, and I'll fetch the latest news!</p>
+    <input type="text" id="searchInput" placeholder="Type a topic, e.g., Technology, Sports">
+    <button onclick="fetchNews()">Search</button>
+
+    <div id="results"></div>
+
+    <script>
+        async function fetchNews() {
+            const apiKey = 'YOUR_NEWS_API_KEY'; // Replace with your NewsAPI key
+            const query = document.getElementById('searchInput').value.trim();
+            const resultsContainer = document.getElementById('results');
+
+            if (!query) {
+                alert("Please enter a topic to search!");
+                return;
+            }
+
+            resultsContainer.innerHTML = `<p>Loading...</p>`; // Loading state
+
+            const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&apiKey=${apiKey}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.status === "ok" && data.articles.length > 0) {
+                    resultsContainer.innerHTML = ""; // Clear loading state
+                    data.articles.slice(0, 5).forEach(article => {
+                        const articleHTML = `
+                            <div class="article">
+                                <h3>${article.title}</h3>
+                                <p><strong>Source:</strong> ${article.source.name}</p>
+                                <p>${article.description || "No description available."}</p>
+                                <a href="${article.url}" target="_blank">Read more</a>
+                            </div>
+                        `;
+                        resultsContainer.innerHTML += articleHTML;
+                    });
+                } else {
+                    resultsContainer.innerHTML = `<p>No news found for "${query}". Please try another topic.</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching news:", error);
+                resultsContainer.innerHTML = `<p>Oops! Something went wrong. Please try again later.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
